@@ -70,4 +70,5 @@ services:
 
   - type: redis
     name: growsafe-redis
+    ipAllowList: []
     plan: starter
