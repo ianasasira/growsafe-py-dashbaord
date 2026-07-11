@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GrowSafe{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        :root {
+            --green: #16a34a;
+            --green-bg: #f0fdf4;
+            --red: #dc2626;
+            --red-bg: #fef2f2;
+            --amber: #d97706;
+            --amber-bg: #fffbeb;
+            --blue: #2563eb;
+            --blue-bg: #eff6ff;
+            --grey-bg: #f8fafc;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-mute: #64748b;
+            --sidebar: #0f172a;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background: var(--grey-bg);
+            color: var(--text);
+        }
+        .sidebar {
+            width: 240px;
+            background: var(--sidebar);
+            color: #e2e8f0;
+        }
+        .sidebar a {
+            padding: 9px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #cbd5e1;
+            display: block;
+        }
+        .sidebar a:hover {
+            background: #1e293b;
+            color: #fff;
+        }
+        .sidebar a.active {
+            background: var(--green);
+            color: #fff;
+            font-weight: 600;
+        }
+        .kpi-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+        .kpi-card.danger {
+            border-color: #fecaca;
+            background: var(--red-bg);
+        }
+        .kpi-card.warning {
+            border-color: #fde68a;
+            background: var(--amber-bg);
+        }
+        .badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 20px;
+        }
+        .badge-green { background: var(--green-bg); color: var(--green); }
+        .badge-red { background: var(--red-bg); color: var(--red); }
+        .badge-amber { background: var(--amber-bg); color: var(--amber); }
+        .badge-blue { background: var(--blue-bg); color: var(--blue); }
+        .badge-grey { background: #f1f5f9; color: var(--text-mute); }
+        .btn {
+            font-size: 13px;
+            padding: 8px 14px;
+            border-radius: 7px;
+            border: 1px solid var(--border);
+            background: #fff;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: var(--sidebar);
+            color: #fff;
+            border-color: var(--sidebar);
+        }
+        .btn-green {
+            background: var(--green);
+            color: #fff;
+            border-color: var(--green);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th {
+            text-align: left;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .03em;
+            color: var(--text-mute);
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="flex min-h-screen">
+        {% block sidebar %}
+        <div class="sidebar flex-shrink-0 flex flex-col p-4">
+            <div class="text-white font-bold text-lg mb-1 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                GrowSafe
+            </div>
+            <div class="text-xs text-gray-400 mb-4 pb-4 border-b border-gray-700">
+                {% if request.company %}{{ request.company.name }}{% else %}Platform Admin{% endif %}
+            </div>
+            <nav class="flex flex-col gap-1">
+                <a href="{% url 'dashboard:overview' %}" class="{% if request.resolver_match.app_name == 'dashboard' %}active{% endif %}">Overview</a>
+                <a href="{% url 'catalog:list' %}" class="{% if request.resolver_match.app_name == 'catalog' %}active{% endif %}">Products</a>
+                <a href="{% url 'batches:list' %}" class="{% if request.resolver_match.app_name == 'batches' %}active{% endif %}">Batches</a>
+                <div class="h-px bg-gray-700 my-2"></div>
+                <a href="{% url 'fraud:list' %}" class="{% if request.resolver_match.app_name == 'fraud' %}active{% endif %}">Fraud Detection</a>
+                <a href="#" class="">Heat Maps</a>
+                <a href="#" class="">Analytics</a>
+                <div class="h-px bg-gray-700 my-2"></div>
+                <a href="{% url 'supply_chain:list' %}" class="{% if request.resolver_match.app_name == 'supply_chain' %}active{% endif %}">Supply Chain</a>
+                <a href="{% url 'retailer_portal:dashboard' %}" class="{% if request.resolver_match.app_name == 'retailer_portal' %}active{% endif %}">Retailers</a>
+                <div class="h-px bg-gray-700 my-2"></div>
+                <a href="{% url 'complaints:list' %}" class="{% if request.resolver_match.app_name == 'complaints' %}active{% endif %}">Complaints</a>
+                <a href="{% url 'recalls:list' %}" class="{% if request.resolver_match.app_name == 'recalls' %}active{% endif %}">Recalls</a>
+                <a href="{% url 'reports:list' %}" class="{% if request.resolver_match.app_name == 'reports' %}active{% endif %}">Reports</a>
+                <div class="h-px bg-gray-700 my-2"></div>
+                <a href="{% url 'ai_insights:list' %}" class="{% if request.resolver_match.app_name == 'ai_insights' %}active{% endif %}">AI Insights</a>
+                <a href="{% url 'settings:index' %}" class="{% if request.resolver_match.app_name == 'settings' %}active{% endif %}">Settings</a>
+                {% if request.user.role == 'superadmin' %}
+                <div class="h-px bg-gray-700 my-2"></div>
+                <a href="{% url 'platform_admin:overview' %}" class="{% if request.resolver_match.app_name == 'platform_admin' %}active{% endif %}">Platform Admin</a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endblock %}
+        
+        <div class="flex-1 flex flex-col">
+            <div class="h-14 bg-white border-b flex items-center justify-between px-6">
+                <h1 class="text-lg font-semibold">{% block page_title %}Dashboard{% endblock %}</h1>
+                <div class="flex items-center gap-4">
+                    <a href="{% url 'notifications:list' %}" class="relative">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                        </svg>
+                    </a>
+                    <div class="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center text-xs font-bold">
+                        {{ request.user.initials }}
+                    </div>
+                    <a href="{% url 'accounts:logout' %}" class="text-sm text-gray-600 hover:text-gray-900">Logout</a>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                    <div class="p-3 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

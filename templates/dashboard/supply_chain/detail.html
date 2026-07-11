@@ -1,0 +1,31 @@
+{% extends "layouts/dashboard.html" %}
+{% block page_title %}{{ partner.name }}{% endblock %}
+{% block content %}
+<div class="bg-white rounded-xl border p-6">
+    <div class="grid grid-cols-2 gap-6">
+        <div>
+            <h2 class="text-xl font-bold mb-4">{{ partner.name }}</h2>
+            <div class="space-y-3">
+                <div><span class="text-sm text-gray-500">Type:</span> <span class="font-semibold">{{ partner.get_partner_type_display }}</span></div>
+                <div><span class="text-sm text-gray-500">Region:</span> <span class="font-semibold">{{ partner.region }}</span></div>
+                <div><span class="text-sm text-gray-500">District:</span> <span class="font-semibold">{{ partner.district }}</span></div>
+                <div><span class="text-sm text-gray-500">Contact:</span> <span class="font-semibold">{{ partner.contact_person }}</span></div>
+                <div><span class="text-sm text-gray-500">Phone:</span> <span class="font-semibold">{{ partner.phone }}</span></div>
+                <div><span class="text-sm text-gray-500">Email:</span> <span class="font-semibold">{{ partner.email }}</span></div>
+            </div>
+        </div>
+        <div>
+            <div id="map" style="height: 300px;"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+const map = L.map('map').setView([1.3733, 32.2903], 12);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+{% if partner.latitude and partner.longitude %}
+L.marker([{{ partner.latitude }}, {{ partner.longitude }}]).addTo(map);
+{% endif %}
+</script>
+{% endblock %}

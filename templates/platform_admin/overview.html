@@ -1,0 +1,37 @@
+{% extends "layouts/dashboard.html" %}
+{% block page_title %}Platform Admin{% endblock %}
+{% block content %}
+<div class="grid grid-cols-3 gap-4 mb-6">
+    <div class="kpi-card">
+        <div class="text-xs text-gray-500 mb-1">Total Companies</div>
+        <div class="text-2xl font-bold">{{ total_companies }}</div>
+    </div>
+    <div class="kpi-card">
+        <div class="text-xs text-gray-500 mb-1">Total Products</div>
+        <div class="text-2xl font-bold">{{ total_products }}</div>
+    </div>
+    <div class="kpi-card">
+        <div class="text-xs text-gray-500 mb-1">Total Scans</div>
+        <div class="text-2xl font-bold">{{ total_scans }}</div>
+    </div>
+</div>
+<div class="bg-white rounded-xl border">
+    <div class="p-4 border-b">
+        <h3 class="font-semibold">Companies</h3>
+    </div>
+    <table>
+        <thead><tr><th>Name</th><th>Plan</th><th>Status</th><th>Products</th><th>Actions</th></tr></thead>
+        <tbody>
+            {% for company in companies %}
+            <tr>
+                <td><a href="{% url 'platform_admin:company_detail' company.pk %}" class="text-green-600 hover:underline">{{ company.name }}</a></td>
+                <td><span class="badge badge-blue">{{ company.plan|title }}</span></td>
+                <td><span class="badge {% if company.status == 'active' %}badge-green{% else %}badge-red{% endif %}">{{ company.status|title }}</span></td>
+                <td>{{ company.product_set.count }}</td>
+                <td><a href="{% url 'platform_admin:company_detail' company.pk %}" class="text-sm text-blue-600 hover:underline">Manage</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "layouts/dashboard.html" %}
+{% block page_title %}AI Insights{% endblock %}
+{% block content %}
+<div class="bg-white rounded-xl border p-6 mb-6">
+    <h3 class="text-sm font-semibold mb-3">Ask a Question</h3>
+    <form method="get" action="{% url 'ai_insights:query' %}" class="flex gap-3">
+        <input type="text" name="q" placeholder="e.g., How many fraud alerts are there?" class="flex-1 px-3 py-2 border rounded-lg text-sm">
+        <button type="submit" class="btn btn-primary">Ask</button>
+    </form>
+</div>
+<div class="bg-white rounded-xl border p-6">
+    <h3 class="text-sm font-semibold mb-4">Recent Insights</h3>
+    <div class="space-y-4">
+        {% for insight in insights %}
+        <div class="border-b pb-4 last:border-0">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="badge badge-blue">{{ insight.category|title }}</span>
+                <h4 class="font-semibold">{{ insight.title }}</h4>
+            </div>
+            <p class="text-sm text-gray-700">{{ insight.insight_text }}</p>
+            <p class="text-xs text-gray-500 mt-2">{{ insight.created_at|timesince }} ago</p>
+        </div>
+        {% empty %}
+        <p class="text-gray-500 text-center py-8">No insights yet. Insights are generated nightly.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

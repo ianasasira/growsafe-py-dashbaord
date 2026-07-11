@@ -1,0 +1,23 @@
+{% extends "layouts/dashboard.html" %}
+{% block page_title %}Fraud Report{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h2 class="text-lg font-semibold">Fraud Alerts</h2>
+    <a href="{% url 'reports:export' 'fraud' %}?format=csv" class="btn btn-primary">Export CSV</a>
+</div>
+<div class="bg-white rounded-xl border">
+    <table>
+        <thead><tr><th>Type</th><th>Risk</th><th>Status</th><th>Created</th></tr></thead>
+        <tbody>
+            {% for alert in alerts %}
+            <tr>
+                <td>{{ alert.get_alert_type_display }}</td>
+                <td><span class="badge {% if alert.risk_level == 'critical' %}badge-red{% else %}badge-amber{% endif %}">{{ alert.risk_level|title }}</span></td>
+                <td><span class="badge badge-blue">{{ alert.status|title }}</span></td>
+                <td class="text-xs text-gray-500">{{ alert.created_at|timesince }} ago</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

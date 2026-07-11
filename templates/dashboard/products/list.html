@@ -1,0 +1,62 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block page_title %}Products{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <div class="flex gap-3">
+        <input type="text" name="q" placeholder="Search products..." value="{{ request.GET.q }}" class="px-3 py-2 border rounded-lg text-sm w-64">
+        <select name="category" class="px-3 py-2 border rounded-lg text-sm">
+            <option value="">All Categories</option>
+            {% for cat in categories %}
+            <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+            {% endfor %}
+        </select>
+        <select name="status" class="px-3 py-2 border rounded-lg text-sm">
+            <option value="">All Status</option>
+            <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+        </select>
+    </div>
+    <a href="{% url 'catalog:create' %}" class="btn btn-primary">Add Product</a>
+</div>
+
+<div class="bg-white rounded-xl border">
+    <table>
+        <thead>
+            <tr>
+                <th>SKU</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Batches</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td class="font-mono text-xs">{{ product.sku }}</td>
+                <td>
+                    <a href="{% url 'catalog:detail' product.pk %}" class="text-green-600 hover:underline">{{ product.name }}</a>
+                </td>
+                <td>{{ product.category.name }}</td>
+                <td>
+                    <span class="badge {% if product.status == 'active' %}badge-green{% else %}badge-grey{% endif %}">
+                        {{ product.status|title }}
+                    </span>
+                </td>
+                <td>{{ product.batch_count }}</td>
+                <td>
+                    <a href="{% url 'catalog:edit' product.pk %}" class="text-sm text-blue-600 hover:underline">Edit</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center text-gray-500 py-8">No products found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

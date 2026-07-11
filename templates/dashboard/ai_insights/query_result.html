@@ -1,0 +1,11 @@
+{% extends "layouts/dashboard.html" %}
+{% block page_title %}Query Result{% endblock %}
+{% block content %}
+<div class="bg-white rounded-xl border p-6">
+    <h3 class="text-sm font-semibold mb-3">Your Query</h3>
+    <p class="text-gray-700 mb-6">{{ query }}</p>
+    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+        <p class="text-green-800">{{ result.answer }}</p>
+    </div>
+</div>
+{% endblock %}

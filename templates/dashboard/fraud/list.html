@@ -1,0 +1,62 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block page_title %}Fraud Detection{% endblock %}
+
+{% block content %}
+<div class="flex gap-3 mb-6">
+    <select class="px-3 py-2 border rounded-lg text-sm">
+        <option value="">All Risk Levels</option>
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+        <option value="critical">Critical</option>
+    </select>
+    <select class="px-3 py-2 border rounded-lg text-sm">
+        <option value="">All Status</option>
+        <option value="open">Open</option>
+        <option value="investigating">Investigating</option>
+        <option value="resolved">Resolved</option>
+    </select>
+</div>
+
+<div class="bg-white rounded-xl border">
+    <table>
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Risk Level</th>
+                <th>Product</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for alert in alerts %}
+            <tr>
+                <td>{{ alert.get_alert_type_display }}</td>
+                <td>
+                    <span class="badge {% if alert.risk_level == 'critical' %}badge-red{% elif alert.risk_level == 'high' %}badge-amber{% else %}badge-grey{% endif %}">
+                        {{ alert.risk_level|title }}
+                    </span>
+                </td>
+                <td>{{ alert.product.name|default:"N/A" }}</td>
+                <td>
+                    <span class="badge {% if alert.status == 'open' %}badge-red{% elif alert.status == 'resolved' %}badge-green{% else %}badge-blue{% endif %}">
+                        {{ alert.status|title }}
+                    </span>
+                </td>
+                <td class="text-xs text-gray-500">{{ alert.created_at|timesince }} ago</td>
+                <td>
+                    <a href="{% url 'fraud:detail' alert.pk %}" class="text-sm text-blue-600 hover:underline">View</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center text-gray-500 py-8">No fraud alerts</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

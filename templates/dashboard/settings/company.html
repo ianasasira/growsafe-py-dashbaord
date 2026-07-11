@@ -1,0 +1,14 @@
+{% extends "layouts/dashboard.html" %}
+{% block page_title %}Company Settings{% endblock %}
+{% block content %}
+<div class="max-w-2xl">
+    <form method="post" class="bg-white rounded-xl border p-6 space-y-4">
+        {% csrf_token %}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+            <input type="text" name="name" value="{{ request.company.name }}" class="w-full px-3 py-2 border rounded-lg">
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+</div>
+{% endblock %}

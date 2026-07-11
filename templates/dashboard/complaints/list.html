@@ -1,0 +1,23 @@
+{% extends "layouts/dashboard.html" %}
+{% block page_title %}Complaints{% endblock %}
+{% block content %}
+<div class="bg-white rounded-xl border">
+    <table>
+        <thead><tr><th>Product</th><th>Issue Type</th><th>Status</th><th>Priority</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody>
+            {% for complaint in complaints %}
+            <tr>
+                <td>{{ complaint.product.name }}</td>
+                <td>{{ complaint.issue_type }}</td>
+                <td><span class="badge {% if complaint.status == 'open' %}badge-red{% elif complaint.status == 'resolved' %}badge-green{% else %}badge-blue{% endif %}">{{ complaint.status|title }}</span></td>
+                <td><span class="badge {% if complaint.priority == 'critical' %}badge-red{% elif complaint.priority == 'high' %}badge-amber{% else %}badge-grey{% endif %}">{{ complaint.priority|title }}</span></td>
+                <td class="text-xs text-gray-500">{{ complaint.created_at|timesince }} ago</td>
+                <td><a href="{% url 'complaints:detail' complaint.pk %}" class="text-sm text-blue-600 hover:underline">View</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-gray-500 py-8">No complaints</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

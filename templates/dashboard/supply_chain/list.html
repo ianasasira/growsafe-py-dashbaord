@@ -1,0 +1,26 @@
+{% extends "layouts/dashboard.html" %}
+{% block page_title %}Supply Chain Partners{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <input type="text" placeholder="Search partners..." class="px-3 py-2 border rounded-lg text-sm w-64">
+    <a href="{% url 'supply_chain:create' %}" class="btn btn-primary">Add Partner</a>
+</div>
+<div class="bg-white rounded-xl border">
+    <table>
+        <thead><tr><th>Name</th><th>Type</th><th>Region</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+            {% for partner in partners %}
+            <tr>
+                <td><a href="{% url 'supply_chain:detail' partner.pk %}" class="text-green-600 hover:underline">{{ partner.name }}</a></td>
+                <td>{{ partner.get_partner_type_display }}</td>
+                <td>{{ partner.region }}</td>
+                <td><span class="badge {% if partner.status == 'active' %}badge-green{% else %}badge-grey{% endif %}">{{ partner.status|title }}</span></td>
+                <td><a href="{% url 'supply_chain:detail' partner.pk %}" class="text-sm text-blue-600 hover:underline">View</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center text-gray-500 py-8">No partners</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

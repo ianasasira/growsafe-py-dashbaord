@@ -1,0 +1,149 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block page_title %}Overview{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-4 gap-4 mb-6">
+    <div class="kpi-card">
+        <div class="text-xs text-gray-500 mb-1">Total Products</div>
+        <div class="text-2xl font-bold">{{ total_products }}</div>
+        <div class="text-xs text-green-600 mt-1">+12 this month</div>
+    </div>
+    <div class="kpi-card">
+        <div class="text-xs text-gray-500 mb-1">Active Batches</div>
+        <div class="text-2xl font-bold">{{ active_batches }}</div>
+        <div class="text-xs text-green-600 mt-1">+240 this month</div>
+    </div>
+    <div class="kpi-card">
+        <div class="text-xs text-gray-500 mb-1">Generated Codes</div>
+        <div class="text-2xl font-bold">{{ total_codes|default:0 }}</div>
+        <div class="text-xs text-green-600 mt-1">+320K this month</div>
+    </div>
+    <div class="kpi-card">
+        <div class="text-xs text-gray-500 mb-1">Total Scans</div>
+        <div class="text-2xl font-bold">{{ total_scans|default:0 }}</div>
+        <div class="text-xs text-green-600 mt-1">+45K today</div>
+    </div>
+</div>
+
+<div class="grid grid-cols-3 gap-4 mb-6">
+    <div class="kpi-card danger">
+        <div class="text-xs text-gray-500 mb-1">Counterfeit Alerts</div>
+        <div class="text-2xl font-bold">{{ fraud_alerts|default:0 }}</div>
+        <div class="text-xs text-red-600 mt-1">{{ critical_alerts|default:0 }} critical</div>
+    </div>
+    <div class="kpi-card">
+        <div class="text-xs text-gray-500 mb-1">Verified Today</div>
+        <div class="text-2xl font-bold">{{ verified_today|default:0 }}</div>
+        <div class="text-xs text-green-600 mt-1">+8% vs yesterday</div>
+    </div>
+    <div class="kpi-card warning">
+        <div class="text-xs text-gray-500 mb-1">Active Recalls</div>
+        <div class="text-2xl font-bold">{{ active_recalls|default:0 }}</div>
+        <div class="text-xs text-amber-600 mt-1">1 high severity</div>
+    </div>
+</div>
+
+<div class="grid grid-cols-2 gap-4 mb-6">
+    <div class="bg-white rounded-xl border p-4">
+        <div class="text-sm font-semibold mb-3">Daily Verification Scans - Last 30 Days</div>
+        <canvas id="scanTrendChart" height="160"></canvas>
+    </div>
+    <div class="bg-white rounded-xl border p-4">
+        <div class="text-sm font-semibold mb-3">Verification Channels</div>
+        <canvas id="channelChart" height="160"></canvas>
+    </div>
+</div>
+
+<div class="grid grid-cols-2 gap-4">
+    <div class="bg-white rounded-xl border p-4">
+        <div class="text-sm font-semibold mb-3">Recent Verification Activity</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Result</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for scan in recent_scans %}
+                <tr>
+                    <td class="font-mono text-xs">{{ scan.code }}</td>
+                    <td>
+                        <span class="badge {% if scan.result == 'genuine' %}badge-green{% elif scan.result == 'already_used' %}badge-amber{% else %}badge-red{% endif %}">
+                            {{ scan.result|title }}
+                        </span>
+                    </td>
+                    <td class="text-xs text-gray-500">{{ scan.scanned_at|timesince }} ago</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center text-gray-500 py-4">No recent scans</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="bg-white rounded-xl border p-4">
+        <div class="text-sm font-semibold mb-3">High Risk Regions</div>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Kampala</td>
+                    <td class="text-right"><span class="badge badge-red">328 alerts</span></td>
+                </tr>
+                <tr>
+                    <td>Mbarara</td>
+                    <td class="text-right"><span class="badge badge-amber">142 alerts</span></td>
+                </tr>
+                <tr>
+                    <td>Gulu</td>
+                    <td class="text-right"><span class="badge badge-grey">67 alerts</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const scanTrendCtx = document.getElementById('scanTrendChart').getContext('2d');
+new Chart(scanTrendCtx, {
+    type: 'line',
+    data: {
+        labels: [{% for item in scan_trend %}'{{ item.scanned_at__date }}',{% endfor %}],
+        datasets: [{
+            label: 'Scans',
+            data: [{% for item in scan_trend %}{{ item.count }},{% endfor %}],
+            borderColor: '#16a34a',
+            backgroundColor: 'rgba(22, 163, 74, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+    }
+});
+
+const channelCtx = document.getElementById('channelChart').getContext('2d');
+new Chart(channelCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['QR', 'SMS', 'USSD'],
+        datasets: [{
+            data: [{{ channel_split.qr }}, {{ channel_split.sms }}, {{ channel_split.ussd }}],
+            backgroundColor: ['#16a34a', '#2563eb', '#d97706']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } }
+    }
+});
+</script>
+{% endblock %}

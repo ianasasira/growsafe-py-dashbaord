@@ -1,0 +1,25 @@
+{% extends "layouts/dashboard.html" %}
+{% block page_title %}Retailer Dashboard{% endblock %}
+{% block content %}
+<div class="grid grid-cols-3 gap-4 mb-6">
+    <div class="kpi-card">
+        <div class="text-xs text-gray-500 mb-1">Stock Received</div>
+        <div class="text-2xl font-bold">0</div>
+    </div>
+    <div class="kpi-card">
+        <div class="text-xs text-gray-500 mb-1">Batches Verified</div>
+        <div class="text-2xl font-bold">0</div>
+    </div>
+    <div class="kpi-card">
+        <div class="text-xs text-gray-500 mb-1">Issues Reported</div>
+        <div class="text-2xl font-bold">0</div>
+    </div>
+</div>
+<div class="bg-white rounded-xl border p-6">
+    <h3 class="text-sm font-semibold mb-4">Quick Actions</h3>
+    <div class="flex gap-3">
+        <a href="{% url 'retailer_portal:stock' %}" class="btn btn-primary">Verify Stock</a>
+        <a href="{% url 'retailer_portal:report' %}" class="btn">Report Issue</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "layouts/dashboard.html" %}
+{% block page_title %}Reports{% endblock %}
+{% block content %}
+<div class="grid grid-cols-3 gap-4">
+    <a href="{% url 'reports:verification' %}" class="bg-white rounded-xl border p-6 hover:shadow-md transition">
+        <h3 class="font-semibold mb-2">Verification Report</h3>
+        <p class="text-sm text-gray-600">Summary of all verification scans</p>
+    </a>
+    <a href="{% url 'reports:fraud' %}" class="bg-white rounded-xl border p-6 hover:shadow-md transition">
+        <h3 class="font-semibold mb-2">Fraud Report</h3>
+        <p class="text-sm text-gray-600">All fraud detection alerts</p>
+    </a>
+    <a href="{% url 'reports:export' 'verification' %}?format=csv" class="bg-white rounded-xl border p-6 hover:shadow-md transition">
+        <h3 class="font-semibold mb-2">Export Verification Data</h3>
+        <p class="text-sm text-gray-600">Download as CSV</p>
+    </a>
+</div>
+{% endblock %}

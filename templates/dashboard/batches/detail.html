@@ -1,0 +1,102 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block page_title %}Batch {{ batch.batch_number }}{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-3 gap-6">
+    <div class="col-span-2">
+        <div class="bg-white rounded-xl border p-6 mb-6">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h2 class="text-xl font-bold">{{ batch.batch_number }}</h2>
+                    <p class="text-sm text-gray-500">{{ batch.product.name }}</p>
+                </div>
+                <span class="badge {% if batch.status == 'active' %}badge-green{% elif batch.status == 'recalled' %}badge-red{% else %}badge-grey{% endif %}">
+                    {{ batch.status|title }}
+                </span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mt-6">
+                <div>
+                    <div class="text-xs text-gray-500">Quantity</div>
+                    <div class="text-lg font-semibold">{{ batch.quantity }}</div>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500">Manufacture Date</div>
+                    <div class="text-lg font-semibold">{{ batch.manufacture_date }}</div>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500">Expiry Date</div>
+                    <div class="text-lg font-semibold">{{ batch.expiry_date }}</div>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500">Codes Generated</div>
+                    <div class="text-lg font-semibold">
+                        {% if batch.codes_generated %}
+                        <span class="text-green-600">Yes ({{ batch.codes_count }})</span>
+                        {% else %}
+                        <span class="text-gray-400">No</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if batch.codes_generated %}
+        <div class="bg-white rounded-xl border p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-sm font-semibold">Verification Codes</h3>
+                <div class="flex gap-2">
+                    <a href="{% url 'batches:export' batch.pk %}?format=csv" class="btn text-sm">Export CSV</a>
+                    <a href="{% url 'batches:export' batch.pk %}?format=pdf" class="btn text-sm">Export PDF</a>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Scan Count</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for code in batch.verification_codes.all|slice:":20" %}
+                    <tr>
+                        <td class="font-mono text-xs">{{ code.code }}</td>
+                        <td>{{ code.scan_count }}</td>
+                        <td>
+                            {% if code.scan_count > 0 %}
+                            <span class="badge badge-amber">Used</span>
+                            {% else %}
+                            <span class="badge badge-green">Unused</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div>
+        {% if not batch.codes_generated %}
+        <div class="bg-white rounded-xl border p-6 mb-6">
+            <h3 class="text-sm font-semibold mb-3">Generate Codes</h3>
+            <p class="text-sm text-gray-600 mb-4">Generate verification codes for this batch.</p>
+            <a href="{% url 'batches:generate_codes' batch.pk %}" class="btn btn-green w-full text-center">Generate Codes</a>
+        </div>
+        {% endif %}
+        
+        <div class="bg-white rounded-xl border p-6">
+            <h3 class="text-sm font-semibold mb-3">Quick Stats</h3>
+            <div class="space-y-3">
+                <div class="flex justify-between">
+                    <span class="text-sm text-gray-600">Total Scans</span>
+                    <span class="font-semibold">{{ batch.scans_count }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

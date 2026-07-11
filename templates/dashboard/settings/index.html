@@ -1,0 +1,18 @@
+{% extends "layouts/dashboard.html" %}
+{% block page_title %}Settings{% endblock %}
+{% block content %}
+<div class="grid grid-cols-4 gap-4">
+    <a href="{% url 'settings:company' %}" class="bg-white rounded-xl border p-6 hover:shadow-md transition">
+        <h3 class="font-semibold mb-2">Company Profile</h3>
+        <p class="text-sm text-gray-600">Update company information</p>
+    </a>
+    <a href="{% url 'settings:users' %}" class="bg-white rounded-xl border p-6 hover:shadow-md transition">
+        <h3 class="font-semibold mb-2">Users</h3>
+        <p class="text-sm text-gray-600">Manage team members</p>
+    </a>
+    <a href="{% url 'settings:verification' %}" class="bg-white rounded-xl border p-6 hover:shadow-md transition">
+        <h3 class="font-semibold mb-2">Verification Page</h3>
+        <p class="text-sm text-gray-600">Customize verification page</p>
+    </a>
+</div>
+{% endblock %}

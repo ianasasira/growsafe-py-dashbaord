@@ -1,0 +1,82 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block page_title %}Verification Result{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-xl border p-8 text-center">
+        {% if result == 'genuine' %}
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-green-600 mb-2">GENUINE PRODUCT</h2>
+        <p class="text-gray-600 mb-6">This product has been verified as authentic.</p>
+        
+        {% if product_data %}
+        <div class="bg-gray-50 rounded-lg p-4 text-left">
+            <div class="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                    <div class="text-gray-500">Product</div>
+                    <div class="font-semibold">{{ product_data.name }}</div>
+                </div>
+                <div>
+                    <div class="text-gray-500">Manufacturer</div>
+                    <div class="font-semibold">{{ product_data.company }}</div>
+                </div>
+                <div>
+                    <div class="text-gray-500">Batch</div>
+                    <div class="font-semibold">{{ product_data.batch }}</div>
+                </div>
+                <div>
+                    <div class="text-gray-500">Manufacture Date</div>
+                    <div class="font-semibold">{{ product_data.manufacture_date }}</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% elif result == 'already_used' %}
+        <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-amber-600 mb-2">ALREADY USED</h2>
+        <p class="text-gray-600 mb-6">This code has been scanned before. Please verify the product packaging is intact.</p>
+        
+        {% elif result == 'recalled' %}
+        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-red-600 mb-2">PRODUCT RECALLED</h2>
+        <p class="text-gray-600 mb-6">This product has been recalled. Please do not use it and contact the manufacturer.</p>
+        
+        {% elif result == 'expired' %}
+        <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-amber-600 mb-2">PRODUCT EXPIRED</h2>
+        <p class="text-gray-600 mb-6">This product has passed its expiry date. Please do not use it.</p>
+        
+        {% else %}
+        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-red-600 mb-2">INVALID CODE</h2>
+        <p class="text-gray-600 mb-6">This verification code is not recognized. The product may be counterfeit.</p>
+        {% endif %}
+        
+        <div class="mt-6 text-sm text-gray-500">
+            Code: <span class="font-mono">{{ code }}</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

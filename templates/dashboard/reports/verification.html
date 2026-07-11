@@ -1,0 +1,23 @@
+{% extends "layouts/dashboard.html" %}
+{% block page_title %}Verification Report{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h2 class="text-lg font-semibold">Recent Scans</h2>
+    <a href="{% url 'reports:export' 'verification' %}?format=csv" class="btn btn-primary">Export CSV</a>
+</div>
+<div class="bg-white rounded-xl border">
+    <table>
+        <thead><tr><th>Code</th><th>Result</th><th>Channel</th><th>Time</th></tr></thead>
+        <tbody>
+            {% for scan in scans %}
+            <tr>
+                <td class="font-mono text-xs">{{ scan.code }}</td>
+                <td><span class="badge {% if scan.result == 'genuine' %}badge-green{% else %}badge-red{% endif %}">{{ scan.result|title }}</span></td>
+                <td>{{ scan.get_channel_display }}</td>
+                <td class="text-xs text-gray-500">{{ scan.scanned_at|timesince }} ago</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

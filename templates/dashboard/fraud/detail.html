@@ -1,0 +1,82 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block page_title %}Fraud Alert Details{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-3 gap-6">
+    <div class="col-span-2">
+        <div class="bg-white rounded-xl border p-6 mb-6">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h2 class="text-xl font-bold">{{ alert.get_alert_type_display }}</h2>
+                    <p class="text-sm text-gray-500">Created {{ alert.created_at|timesince }} ago</p>
+                </div>
+                <span class="badge {% if alert.risk_level == 'critical' %}badge-red{% elif alert.risk_level == 'high' %}badge-amber{% else %}badge-grey{% endif %}">
+                    {{ alert.risk_level|title }} Risk
+                </span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mt-6">
+                <div>
+                    <div class="text-xs text-gray-500">Product</div>
+                    <div class="font-semibold">{{ alert.product.name|default:"N/A" }}</div>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500">Batch</div>
+                    <div class="font-semibold">{{ alert.batch.batch_number|default:"N/A" }}</div>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500">Status</div>
+                    <div class="font-semibold">{{ alert.status|title }}</div>
+                </div>
+            </div>
+            
+            {% if alert.details %}
+            <div class="mt-6">
+                <h3 class="text-sm font-semibold mb-2">Details</h3>
+                <pre class="bg-gray-50 p-3 rounded text-xs">{{ alert.details|pprint }}</pre>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="bg-white rounded-xl border p-6">
+            <h3 class="text-sm font-semibold mb-4">Scan Locations</h3>
+            <div id="map" style="height: 300px;"></div>
+        </div>
+    </div>
+    
+    <div>
+        <div class="bg-white rounded-xl border p-6 mb-6">
+            <h3 class="text-sm font-semibold mb-3">Actions</h3>
+            <div class="space-y-2">
+                <form method="post" action="{% url 'fraud:resolve' alert.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-green w-full">Mark as Resolved</button>
+                </form>
+                <form method="post" action="{% url 'fraud:dismiss' alert.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn w-full">Dismiss</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const map = L.map('map').setView([1.3733, 32.2903], 7);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+const locations = {{ alert.locations|safe }};
+if (locations.length > 0) {
+    const markers = locations.map(loc => L.marker([loc.lat, loc.lng]).addTo(map));
+    if (markers.length > 1) {
+        const group = L.featureGroup(markers);
+        map.fitBounds(group.getBounds().pad(0.2));
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "layouts/dashboard.html" %}
+{% block page_title %}Product Journey{% endblock %}
+{% block content %}
+<div class="bg-white rounded-xl border p-6 mb-6">
+    <h3 class="text-sm font-semibold mb-4">Journey for Code: {{ vcode.code }}</h3>
+    <div class="flex items-center gap-2 mb-6">
+        {% for event in journey %}
+        <div class="flex items-center">
+            <div class="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center text-xs font-bold">
+                {{ forloop.counter }}
+            </div>
+            <div class="ml-2">
+                <div class="text-sm font-semibold">{{ event.get_stage_display }}</div>
+                <div class="text-xs text-gray-500">{{ event.timestamp|date:"M d, Y H:i" }}</div>
+            </div>
+        </div>
+        {% if not forloop.last %}
+        <div class="flex-1 h-0.5 bg-gray-300 mx-2"></div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+<div class="bg-white rounded-xl border p-6">
+    <div id="map" style="height: 400px;"></div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+const map = L.map('map').setView([1.3733, 32.2903], 7);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+const points = [];
+{% for event in journey %}
+{% if event.latitude and event.longitude %}
+points.push([{{ event.latitude }}, {{ event.longitude }}]);
+L.marker([{{ event.latitude }}, {{ event.longitude }}]).addTo(map).bindPopup('{{ event.get_stage_display }}');
+{% endif %}
+{% endfor %}
+if (points.length > 1) {
+    L.polyline(points, {color: '#16a34a', weight: 3}).addTo(map);
+    map.fitBounds(L.latLngBounds(points).pad(0.2));
+}
+</script>
+{% endblock %}

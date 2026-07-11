@@ -1,0 +1,61 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block page_title %}Batches{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <input type="text" placeholder="Search batches..." class="px-3 py-2 border rounded-lg text-sm w-64">
+    <a href="{% url 'batches:create' %}" class="btn btn-primary">Create Batch</a>
+</div>
+
+<div class="bg-white rounded-xl border">
+    <table>
+        <thead>
+            <tr>
+                <th>Batch Number</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Manufacture Date</th>
+                <th>Expiry Date</th>
+                <th>Status</th>
+                <th>Codes</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for batch in batches %}
+            <tr>
+                <td class="font-mono text-xs">
+                    <a href="{% url 'batches:detail' batch.pk %}" class="text-green-600 hover:underline">{{ batch.batch_number }}</a>
+                </td>
+                <td>{{ batch.product.name }}</td>
+                <td>{{ batch.quantity }}</td>
+                <td>{{ batch.manufacture_date }}</td>
+                <td>{{ batch.expiry_date }}</td>
+                <td>
+                    <span class="badge {% if batch.status == 'active' %}badge-green{% elif batch.status == 'recalled' %}badge-red{% else %}badge-grey{% endif %}">
+                        {{ batch.status|title }}
+                    </span>
+                </td>
+                <td>
+                    {% if batch.codes_generated %}
+                    <span class="badge badge-green">Generated</span>
+                    {% else %}
+                    <span class="badge badge-grey">Pending</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if not batch.codes_generated %}
+                    <a href="{% url 'batches:generate_codes' batch.pk %}" class="text-sm text-blue-600 hover:underline">Generate Codes</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center text-gray-500 py-8">No batches found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

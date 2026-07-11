@@ -1,0 +1,77 @@
+{% extends "layouts/dashboard.html" %}
+
+{% block page_title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-3 gap-6">
+    <div class="col-span-2">
+        <div class="bg-white rounded-xl border p-6 mb-6">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h2 class="text-xl font-bold">{{ product.name }}</h2>
+                    <p class="text-sm text-gray-500">SKU: {{ product.sku }}</p>
+                </div>
+                <span class="badge {% if product.status == 'active' %}badge-green{% else %}badge-grey{% endif %}">
+                    {{ product.status|title }}
+                </span>
+            </div>
+            <p class="text-sm text-gray-700">{{ product.description }}</p>
+            {% if product.active_ingredients %}
+            <div class="mt-4">
+                <h3 class="text-sm font-semibold mb-1">Active Ingredients</h3>
+                <p class="text-sm text-gray-600">{{ product.active_ingredients }}</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="bg-white rounded-xl border p-6">
+            <h3 class="text-sm font-semibold mb-4">Batches</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Batch Number</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th>Expiry</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for batch in product.batches.all %}
+                    <tr>
+                        <td><a href="{% url 'batches:detail' batch.pk %}" class="text-green-600 hover:underline">{{ batch.batch_number }}</a></td>
+                        <td>{{ batch.quantity }}</td>
+                        <td><span class="badge badge-green">{{ batch.status|title }}</span></td>
+                        <td>{{ batch.expiry_date }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-gray-500 py-4">No batches yet</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div>
+        <div class="bg-white rounded-xl border p-6 mb-6">
+            <h3 class="text-sm font-semibold mb-4">Quick Stats</h3>
+            <div class="space-y-3">
+                <div class="flex justify-between">
+                    <span class="text-sm text-gray-600">Total Batches</span>
+                    <span class="font-semibold">{{ product.batch_count }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-sm text-gray-600">Total Codes</span>
+                    <span class="font-semibold">{{ product.total_codes }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col gap-2">
+            <a href="{% url 'catalog:edit' product.pk %}" class="btn btn-primary text-center">Edit Product</a>
+            <a href="{% url 'batches:create' %}?product={{ product.pk }}" class="btn btn-green text-center">Add Batch</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
